@@ -116,3 +116,17 @@ Route::group(['prefix' => 'profile', 'as' => 'profile.', 'middleware' => ['auth'
 Route::get('/locale/{lang}', [LocaleController::class, 'switch'])->name('locale.switch');
 Route::get('/screenshot-login/{email}', [ScreenshotGeneratorLoginController::class, 'login'])->middleware('web')->name('screenshot.login');
 Route::get('/demo-preview', fn () => view('demo.preview'))->name('demo.preview');
+
+/**
+ * Public Portfolio Routes
+ */
+Route::group(['as' => 'portfolio.'], function () {
+    Route::get('/', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
+    Route::get('/about', [App\Http\Controllers\Frontend\AboutController::class, 'index'])->name('about');
+    Route::get('/portfolio', [App\Http\Controllers\Frontend\PortfolioController::class, 'index'])->name('projects.index');
+    Route::get('/portfolio/{slug}', [App\Http\Controllers\Frontend\PortfolioController::class, 'show'])->name('projects.show');
+    Route::get('/education', [App\Http\Controllers\Frontend\EducationController::class, 'index'])->name('education');
+    Route::get('/experience', [App\Http\Controllers\Frontend\ExperienceController::class, 'index'])->name('experience');
+    Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'index'])->name('contact');
+    Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'store'])->name('contact.store');
+});
