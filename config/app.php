@@ -230,7 +230,6 @@ return [
         App\Providers\ModuleServiceProvider::class,
         App\Providers\AdminRoutingServiceProvider::class,
         App\Providers\HookServiceProvider::class,
-        App\Providers\PortfolioServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
     ],
 
