@@ -18,13 +18,7 @@ class Authenticate extends Middleware
         if (! $request->expectsJson()) {
             // Check if the request is for an admin route
             if ($request->is('admin/*') || $request->is('admin')) {
-                $disableRedirect = config('settings.disable_default_admin_redirect', '0') === '1';
-
-                // If redirect is disabled, show 403.
-                if ($disableRedirect) {
-                    return abort(403, 'Unauthorized access');
-                }
-
+                // Redirect to admin login
                 return route('admin.login');
             }
 

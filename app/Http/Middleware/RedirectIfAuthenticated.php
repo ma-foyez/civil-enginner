@@ -17,11 +17,14 @@ class RedirectIfAuthenticated
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (Auth::guard('web')->check()) {
-            return redirect(RouteServiceProvider::ADMIN_DASHBOARD);
-        }
+        // Only redirect authenticated users when accessing login pages or register pages
+        if (Auth::guard($guard)->check() && ($request->is('login') || $request->is('admin/login') || $request->is('register'))) {
+            // For admin-related paths, redirect to admin dashboard
+            if (str_starts_with($request->path(), 'admin')) {
+                return redirect(RouteServiceProvider::ADMIN_DASHBOARD);
+            }
 
-        if (Auth::guard($guard)->check()) {
+            // For non-admin paths, redirect to home
             return redirect(RouteServiceProvider::HOME);
         }
 

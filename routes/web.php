@@ -2,13 +2,19 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Backend\AboutSectionController;
 use App\Http\Controllers\Backend\ActionLogController;
 use App\Http\Controllers\Backend\Auth\ScreenshotGeneratorLoginController;
+use App\Http\Controllers\Backend\ContactMessageController;
 use App\Http\Controllers\Backend\DashboardController;
+use App\Http\Controllers\Backend\EducationController as BackendEducationController;
+use App\Http\Controllers\Backend\ExperienceController as BackendExperienceController;
+use App\Http\Controllers\Backend\HeroSectionController;
 use App\Http\Controllers\Backend\LocaleController;
 use App\Http\Controllers\Backend\MediaController;
 use App\Http\Controllers\Backend\ModuleController;
 use App\Http\Controllers\Backend\PermissionController;
+use App\Http\Controllers\Backend\PortfolioController as BackendPortfolioController;
 use App\Http\Controllers\Backend\PostController;
 use App\Http\Controllers\Backend\ProfileController;
 use App\Http\Controllers\Backend\RoleController;
@@ -17,6 +23,12 @@ use App\Http\Controllers\Backend\TermController;
 use App\Http\Controllers\Backend\TranslationController;
 use App\Http\Controllers\Backend\UserLoginAsController;
 use App\Http\Controllers\Backend\UserController;
+use App\Http\Controllers\Frontend\AboutController;
+use App\Http\Controllers\Frontend\ContactController;
+use App\Http\Controllers\Frontend\EducationController;
+use App\Http\Controllers\Frontend\ExperienceController;
+use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\PortfolioController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,10 +43,86 @@ use Illuminate\Support\Facades\Route;
 */
 
 /**
+ * Frontend routes
+ */
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+/**
+ * Root route - explicitly map the home page with highest priority
+ */
+Route::get('/', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('frontend.home');
+
+/**
+ * Other Frontend routes
+ */
+Route::group(['as' => 'frontend.'], function () {
+    Route::get('/about', [AboutController::class, 'index'])->name('about');
+    Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio');
+    Route::get('/portfolio/{slug}', [PortfolioController::class, 'show'])->name('portfolio.show');
+    Route::get('/education', [EducationController::class, 'index'])->name('education');
+    Route::get('/experience', [ExperienceController::class, 'index'])->name('experience');
+    Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+    Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+});
+
+/**
+ * Admin dashboard redirect route - handle /admin specifically
+ */
+Route::get('/admin', function () {
+    if (!\Illuminate\Support\Facades\Auth::check()) {
+        return redirect()->route('admin.login');
+    }
+    return redirect()->route('admin.dashboard');
+})->name('admin.redirect');
+
+/**
+ * Admin dashboard route
+ */
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('admin.dashboard');
+
+/**
  * Admin routes.
  */
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    // Portfolio Management Routes
+    Route::resource('portfolio', BackendPortfolioController::class);
+    Route::delete('portfolio/delete/bulk-delete', [BackendPortfolioController::class, 'bulkDelete'])->name('portfolio.bulk-delete');
+
+    // Hero Sections Routes
+    Route::resource('hero-sections', HeroSectionController::class);
+    Route::delete('hero-sections/delete/bulk-delete', [HeroSectionController::class, 'bulkDelete'])->name('hero-sections.bulk-delete');
+
+    // About Sections Routes
+    Route::resource('about-sections', AboutSectionController::class);
+    Route::delete('about-sections/delete/bulk-delete', [AboutSectionController::class, 'bulkDelete'])->name('about-sections.bulk-delete');
+
+    // Education Routes
+    Route::resource('education', BackendEducationController::class);
+    Route::delete('education/delete/bulk-delete', [BackendEducationController::class, 'bulkDelete'])->name('education.bulk-delete');
+
+    // Experience Routes
+    Route::resource('experience', BackendExperienceController::class);
+    Route::delete('experience/delete/bulk-delete', [BackendExperienceController::class, 'bulkDelete'])->name('experience.bulk-delete');
+
+    // Contact Messages Routes
+    Route::resource('contact-messages', ContactMessageController::class)->only(['index', 'show', 'destroy']);
+    Route::post('contact-messages/{contactMessage}/mark-read', [ContactMessageController::class, 'markAsRead'])->name('contact-messages.mark-read');
+    Route::delete('contact-messages/delete/bulk-delete', [ContactMessageController::class, 'bulkDelete'])->name('contact-messages.bulk-delete');
+
     Route::resource('roles', RoleController::class);
     Route::delete('roles/delete/bulk-delete', [RoleController::class, 'bulkDelete'])->name('roles.bulk-delete');
 
@@ -115,4 +203,4 @@ Route::group(['prefix' => 'profile', 'as' => 'profile.', 'middleware' => ['auth'
 
 Route::get('/locale/{lang}', [LocaleController::class, 'switch'])->name('locale.switch');
 Route::get('/screenshot-login/{email}', [ScreenshotGeneratorLoginController::class, 'login'])->middleware('web')->name('screenshot.login');
-Route::get('/demo-preview', fn () => view('demo.preview'))->name('demo.preview');
+Route::get('/demo-preview', fn() => view('demo.preview'))->name('demo.preview');

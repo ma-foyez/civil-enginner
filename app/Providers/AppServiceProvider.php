@@ -32,7 +32,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Handle "/" route redirection.
+        // Don't redirect root route to admin, allowing the frontend to be displayed
+        // The following code has been disabled to allow the frontend landing page:
+        /*
         if (
             ! $this->app->runningInConsole() &&
             request()->is('/') &&
@@ -41,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
             redirect('/admin')->send();
             exit;
         }
+        */
 
         // Scramable auth configuration.
         Scramble::configure()
