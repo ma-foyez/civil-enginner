@@ -126,10 +126,10 @@ class PortfolioSeeder extends Seeder
                 'excerpt' => 'Exploring innovative materials and techniques that are shaping the future of eco-friendly construction.',
                 'content' => '<p>Sustainable construction is no longer just a trend—it\'s becoming the standard for responsible building practices. In this post, we explore the latest innovations in green building materials, energy-efficient design, and sustainable construction techniques.</p><p>From recycled steel to bio-based insulation materials, the construction industry is embracing environmentally friendly alternatives that don\'t compromise on quality or performance.</p>',
                 'status' => 'published',
-                'type' => 'post',
-                'author_id' => $user->id,
+                'post_type' => 'post',
+                'user_id' => $user->id,
                 'published_at' => now()->subDays(5),
-                'category_id' => $categories->where('slug', 'sustainability')->first()?->id,
+                'category_slug' => 'sustainability',
             ],
             [
                 'title' => 'BIM Technology in Modern Construction',
@@ -137,10 +137,10 @@ class PortfolioSeeder extends Seeder
                 'excerpt' => 'How Building Information Modeling is revolutionizing the way we design and construct buildings.',
                 'content' => '<p>Building Information Modeling (BIM) has transformed the construction industry by enabling better collaboration, reducing errors, and improving project efficiency.</p><p>This technology allows engineers, architects, and contractors to work with shared 3D models that contain detailed information about every aspect of a building project.</p>',
                 'status' => 'published',
-                'type' => 'post',
-                'author_id' => $user->id,
+                'post_type' => 'post',
+                'user_id' => $user->id,
                 'published_at' => now()->subDays(12),
-                'category_id' => $categories->where('slug', 'engineering-insights')->first()?->id,
+                'category_slug' => 'engineering-insights',
             ],
             [
                 'title' => 'Project Management Best Practices',
@@ -148,15 +148,26 @@ class PortfolioSeeder extends Seeder
                 'excerpt' => 'Essential strategies for successful project delivery in the construction industry.',
                 'content' => '<p>Effective project management is crucial for the success of any construction project. Here are some best practices that have proven successful in managing complex engineering projects.</p><p>From stakeholder communication to risk management, these strategies help ensure projects are delivered on time and within budget.</p>',
                 'status' => 'published',
-                'type' => 'post',
-                'author_id' => $user->id,
+                'post_type' => 'post',
+                'user_id' => $user->id,
                 'published_at' => now()->subDays(20),
-                'category_id' => $categories->where('slug', 'project-management')->first()?->id,
+                'category_slug' => 'project-management',
             ],
         ];
 
-        foreach ($posts as $post) {
-            Post::create($post);
+        foreach ($posts as $postData) {
+            $categorySlug = $postData['category_slug'] ?? null;
+            unset($postData['category_slug']); // Remove from data before creating post
+            
+            $post = Post::create($postData);
+            
+            // Handle category relationship if specified
+            if ($categorySlug) {
+                $category = $categories->where('slug', $categorySlug)->first();
+                if ($category) {
+                    $post->terms()->attach($category->id);
+                }
+            }
         }
     }
 
