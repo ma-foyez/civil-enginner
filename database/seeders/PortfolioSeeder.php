@@ -158,9 +158,9 @@ class PortfolioSeeder extends Seeder
         foreach ($posts as $postData) {
             $categorySlug = $postData['category_slug'] ?? null;
             unset($postData['category_slug']); // Remove from data before creating post
-            
+
             $post = Post::create($postData);
-            
+
             // Handle category relationship if specified
             if ($categorySlug) {
                 $category = $categories->where('slug', $categorySlug)->first();
