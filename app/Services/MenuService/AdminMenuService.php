@@ -7,6 +7,7 @@ namespace App\Services\MenuService;
 use App\Enums\Hooks\AdminFilterHook;
 use App\Services\Content\ContentService;
 use App\Support\Facades\Hook;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -50,7 +51,7 @@ class AdminMenuService
             $data['children'] = array_map(
                 function ($child) {
                     // Check if user is authenticated
-                    $user = auth()->user();
+                    $user = Auth::user();
                     if (! $user) {
                         return null;
                     }
@@ -106,6 +107,87 @@ class AdminMenuService
             'id' => 'dashboard',
             'priority' => 1,
             'permissions' => 'dashboard.view',
+        ]);
+
+        // Portfolio Management
+        $this->addMenuItem([
+            'label' => __('Portfolio'),
+            'icon' => 'lucide:briefcase',
+            'id' => 'portfolio-submenu',
+            'active' => Route::is('admin.portfolio.*'),
+            'priority' => 8,
+            'permissions' => ['portfolio.view', 'portfolio.create', 'portfolio.edit'],
+            'children' => [
+                [
+                    'label' => __('All Projects'),
+                    'route' => route('admin.portfolio.index'),
+                    'active' => Route::is('admin.portfolio.index'),
+                    'priority' => 10,
+                    'permissions' => 'portfolio.view',
+                ],
+                [
+                    'label' => __('Add New Project'),
+                    'route' => route('admin.portfolio.create'),
+                    'active' => Route::is('admin.portfolio.create'),
+                    'priority' => 20,
+                    'permissions' => 'portfolio.create',
+                ],
+            ],
+        ]);
+
+        // Hero Sections Management
+        $this->addMenuItem([
+            'label' => __('Hero Sections'),
+            'icon' => 'lucide:image',
+            'route' => route('admin.hero-sections.index'),
+            'active' => Route::is('admin.hero-sections.*'),
+            'id' => 'hero-sections',
+            'priority' => 9,
+            'permissions' => ['hero.view', 'hero.create', 'hero.edit'],
+        ]);
+
+        // About Sections Management
+        $this->addMenuItem([
+            'label' => __('About Sections'),
+            'icon' => 'lucide:user',
+            'route' => route('admin.about-sections.index'),
+            'active' => Route::is('admin.about-sections.*'),
+            'id' => 'about-sections',
+            'priority' => 10,
+            'permissions' => ['about.view', 'about.create', 'about.edit'],
+        ]);
+
+        // Education Management
+        $this->addMenuItem([
+            'label' => __('Education'),
+            'icon' => 'lucide:graduation-cap',
+            'route' => route('admin.education.index'),
+            'active' => Route::is('admin.education.*'),
+            'id' => 'education',
+            'priority' => 11,
+            'permissions' => ['education.view', 'education.create', 'education.edit'],
+        ]);
+
+        // Experience Management
+        $this->addMenuItem([
+            'label' => __('Experience'),
+            'icon' => 'lucide:briefcase',
+            'route' => route('admin.experience.index'),
+            'active' => Route::is('admin.experience.*'),
+            'id' => 'experience',
+            'priority' => 12,
+            'permissions' => ['experience.view', 'experience.create', 'experience.edit'],
+        ]);
+
+        // Contact Messages
+        $this->addMenuItem([
+            'label' => __('Contact Messages'),
+            'icon' => 'lucide:mail',
+            'route' => route('admin.contact-messages.index'),
+            'active' => Route::is('admin.contact-messages.*'),
+            'id' => 'contact-messages',
+            'priority' => 13,
+            'permissions' => ['contact.view'],
         ]);
 
         $this->registerPostTypesInMenu(null);

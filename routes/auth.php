@@ -5,6 +5,7 @@ declare(strict_types=1);
 /**
  * Frontend auth imports.
  */
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController as UserRegisterController;
 use App\Http\Controllers\Auth\LoginController as UserLoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController as UserForgotPasswordController;
@@ -21,7 +22,7 @@ use App\Http\Controllers\Auth\ResetPasswordController as UserResetPasswordContro
 */
 
 // Public User authentication routes with reCAPTCHA middleware.
-Route::group(['middleware' => 'guest'], function () {
+Route::group(['middleware' => 'guest', 'prefix' => 'user'], function () {
     // Registration Routes.
     Route::get('register', [UserRegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('register', [UserRegisterController::class, 'register'])

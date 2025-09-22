@@ -18,14 +18,8 @@ class AdminRedirectMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Only handle exact /admin path
-        if ($request->path() === 'admin') {
-            // If user is authenticated, let the route handle it normally (dashboard)
-            if (Auth::check()) {
-                return $next($request);
-            }
-
-            // For non-authenticated users:
+        // Only handle exact /admin path (not admin/login or other admin routes)
+        if ($request->path() === 'admin' && !Auth::check()) {
             $disableRedirect = config('settings.disable_default_admin_redirect', '0') === '1';
 
             // If redirect is disabled, show 403
